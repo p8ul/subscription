@@ -1,0 +1,30 @@
+export const categoryQueries = {
+  createTable: `CREATE TABLE IF NOT EXISTS Category (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL UNIQUE,
+    rating INTEGER
+  );`,
+  populateItems: `INSERT OR IGNORE INTO Category (name) VALUES
+    ('Blended Whisky'),
+    ('Gin'),
+    ('Cognac'),
+    ('Vapes'),
+    ('White Wine'),
+    ('Liqueur'),
+    ('Red Wine'),
+    ('Tequila'),
+    ('Red Sweet Wine'),
+    ('Rosé Wine'),
+    ('Beer'),
+    ('Vodka'),
+    ('Rum'),
+    ('Blended Whisky'),
+    ('Bourbon'),
+    ('Liqueur'),
+    ('Vermouth'),
+    ('Whisky'),
+    ('Cider'),
+    ('Cigaret'),
+    ('Soda'),
+    ('Cooler');`,
+};
