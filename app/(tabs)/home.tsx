@@ -2,10 +2,10 @@ import { Box } from "@/components/ui/box";
 import React from "react";
 import { ActivityIndicator, View, Dimensions } from "react-native";
 import { useSQLiteContext } from "expo-sqlite/next";
-import TrendingSection from "@/components/sections/Product/TrendingSection";
 import MainHeader from "@/components/Header/MainHeader";
 import { useAppContext } from "@/context/AppContext";
 import { get } from "lodash";
+import HomeSection from "@/components/sections/Home/HomeSection";
 
 const {height} = Dimensions.get('screen');
 
@@ -41,9 +41,7 @@ const HomeScreen = () => {
     <Box style={{ backgroundColor: "white", height: height }}>
       <MainHeader title={get(settings, 'storeName')} showLeftComponentAsLogo />
 
-      <View>
-        <TrendingSection />
-      </View>
+        <HomeSection />
     </Box>
   );
 };

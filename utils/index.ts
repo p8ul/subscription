@@ -29,3 +29,22 @@ export function getNextMonthEndDate() {
 export function formatNumberWithCommas(number: string | number) {
   return number?.toString()?.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
+
+export function getFullMonthName(date = new Date()) {
+  const monthNames = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December"
+  ];
+
+  return monthNames[date.getMonth()];
+}

@@ -25,7 +25,7 @@ const MainHeader: React.FC<MainHeaderProps> = ({
           onPress={() => router.back()}
           style={styles.backButton}
         >
-          <Ionicons name="arrow-back" size={24} color="black" />
+          <Ionicons name="arrow-back" size={24} color="white" />
         </TouchableOpacity>
       )}
 
@@ -38,7 +38,7 @@ const MainHeader: React.FC<MainHeaderProps> = ({
           rightComponent
         ) : (
           <TouchableOpacity onPress={() => router.navigate('/cart')}>
-            <CartIconWithBadge /> 
+            <CartIconWithBadge color="white"/> 
           </TouchableOpacity>
         )}
       </View>
@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     padding: 16,
-    backgroundColor: "#fff",
+    backgroundColor: "#121212",
   },
   backButton: {
     paddingRight: 16,
@@ -67,6 +67,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     flex: 1,
     textAlign: "center",
+    color: 'white'
   },
   rightComponent: {
     paddingLeft: 16,

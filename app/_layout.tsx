@@ -10,7 +10,12 @@ import {
 } from "@react-navigation/native";
 import * as FileSystem from "expo-file-system";
 import { Asset } from "expo-asset";
-import { ActivityIndicator, useColorScheme, View } from "react-native";
+import {
+  ActivityIndicator,
+  StatusBar,
+  useColorScheme,
+  View,
+} from "react-native";
 import { useCart } from "@/store/cartStore";
 import { Text } from "@/components/ui/text";
 import { useAuth } from "@/store/authStore";
@@ -19,7 +24,7 @@ import { SQLiteProvider } from "expo-sqlite";
 import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { AppProvider } from "@/context/AppContext";
-// import FloatingHeader from "@/components/ui/header/FloatingHeader";
+import { MenuProvider } from "react-native-popup-menu";
 
 // Create a client
 const queryClient = new QueryClient();
@@ -70,28 +75,33 @@ export default function RootLayout() {
       <CustomStripeProvider>
         <GluestackUIProvider>
           <SQLiteProvider databaseName="mySQLiteDB.db" useSuspense>
-            <AppProvider>
-              <SafeAreaView style={{ flex: 1 }}>
-                <ThemeProvider
-                  value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
-                >
-                  <Stack
-                    screenOptions={{
-                      headerShown: false,
-                    }}
-                  >
-                    <Stack.Screen
-                      name="(tabs)"
-                      options={{ headerShown: false }}
-                    />
-                    {/* <Stack.Screen
+            <MenuProvider>
+              <AppProvider>
+                <StatusBar barStyle="light-content" backgroundColor="#121212" />
+                <View style={{ backgroundColor: "#121212", flex: 1 }}>
+                  <SafeAreaView style={{ flex: 1, backgroundColor: "#121212" }}>
+                    <ThemeProvider
+                      value={colorScheme === "dark" ? DarkTheme : DarkTheme}
+                    >
+                      <Stack
+                        screenOptions={{
+                          headerShown: false,
+                        }}
+                      >
+                        <Stack.Screen
+                          name="(tabs)"
+                          options={{ headerShown: false }}
+                        />
+                        {/* <Stack.Screen
                     name="modal"
                     options={{ presentation: "modal" }}
                   /> */}
-                  </Stack>
-                </ThemeProvider>
-              </SafeAreaView>
-            </AppProvider>
+                      </Stack>
+                    </ThemeProvider>
+                  </SafeAreaView>
+                </View>
+              </AppProvider>
+            </MenuProvider>
           </SQLiteProvider>
         </GluestackUIProvider>
       </CustomStripeProvider>

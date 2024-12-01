@@ -1,5 +1,7 @@
 import useProductQueries from "@/database/hooks/products/useProductQueries";
 import useSettingsQueries from "@/database/hooks/settings/useSettingsQueries";
+import useSubscriptionQueries from "@/database/hooks/subscription/useSubscriptionQueries";
+import useUserQueries from "@/database/hooks/users/useUserQueries";
 import { categoryQueries } from "@/database/queries/categories";
 import { orderQueries } from "@/database/queries/orders";
 import { productQueries } from "@/database/queries/products";
@@ -32,6 +34,15 @@ interface Order {
   updatedAt?: string;
 }
 
+export interface User {
+  id: number;
+  name: string;
+  email: string;
+  phone: string;
+  meta: any;
+  createAt: string;
+}
+
 export interface Settings {
   id: number;
   storeName: string;
@@ -51,6 +62,7 @@ interface AppState {
   products: Product[];
   cart: Product[];
   orders: Order[];
+  users: User[];
   order: {
     products: Product[];
     total: number;
@@ -83,6 +95,7 @@ const initialState: AppState = {
   products: [],
   cart: [],
   orders: [],
+  users: [],
   order: {
     products: [],
     total: 0,
@@ -99,7 +112,7 @@ const initialState: AppState = {
   },
   settings: {
     id: 1,
-    storeName: "Liquor Store",
+    storeName: "Subscription",
     timezone: "Africa/Nairobi",
     currency: "KSH",
   },
@@ -122,6 +135,7 @@ const UPDATE_ORDER = "UPDATE_ORDER";
 const SET_ORDERS = "SET_ORDERS";
 const SET_CART_ITEM_QUANTITY = "SET_CART_ITEM_QUANTITY";
 const SET_SETTINGS = "SET_SETTINGS";
+const SET_USERS = "SET_USERS";
 
 // Define the reducer function
 const appReducer = (state: AppState, action: any): AppState => {
@@ -142,6 +156,8 @@ const appReducer = (state: AppState, action: any): AppState => {
       return { ...state, settings: action.payload };
     case SET_ORDERS:
       return { ...state, orders: action.payload };
+    case SET_USERS:
+      return { ...state, users: action.payload };
     case ADD_TO_CART:
       const existingProduct = state.cart.find(
         (item) => item.id === action.payload.id
@@ -229,13 +245,18 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({
 
   const { getProductsByID } = useProductQueries();
   const { getSettings } = useSettingsQueries();
+  const { initializeUserTable, dummyUsers, getUsers } = useUserQueries();
+  const { initializeSubscriptionTable } = useSubscriptionQueries();
 
   useEffect(() => {
     createTables();
   }, []);
 
   async function createTables() {
-    // await db.runAsync(`DROP TABLE IF EXISTS Setting;`)
+    // await db.runAsync(`DROP TABLE IF EXISTS Subscription;`)
+    await initializeUserTable();
+    await initializeSubscriptionTable();
+    await dummyUsers();
     await db.runAsync(settingsQueries.createTable);
     await db.runAsync(settingsQueries.populateItems);
     await db.getAllAsync<Product>(categoryQueries.createTable);
@@ -256,6 +277,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({
     await fetchProducts(10000, 0);
     await db.runAsync(stockQueries.createTable);
     const settings = await getSettings();
+    const users = await getUsers();
+
+    dispatch(setUsers(users));
+
     dispatch(setSettings(settings));
   }
 
@@ -462,5 +487,10 @@ export const setCartQuantity = (payload: any) => ({
 
 export const setSettings = (payload: any) => ({
   type: SET_SETTINGS,
+  payload,
+});
+
+export const setUsers = (payload: any) => ({
+  type: SET_USERS,
   payload,
 });
