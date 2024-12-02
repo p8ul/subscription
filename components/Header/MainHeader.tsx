@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, Image, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import CartIconWithBadge from "./CartIconWithBadge";
+import SubIcon from "../icons/SubIcon";
 
 interface MainHeaderProps {
   title: string;
@@ -19,7 +20,7 @@ const MainHeader: React.FC<MainHeaderProps> = ({
     <View style={styles.headerContainer}>
       {/* Left Component: either Back Button or Logo */}
       {showLeftComponentAsLogo ? (
-        <Image source={require("../../assets/icons/64x64/2.png")} style={styles.logo} />
+         <SubIcon width={50} height={50} color="white" />
       ) : (
         <TouchableOpacity
           onPress={() => router.back()}
@@ -37,8 +38,8 @@ const MainHeader: React.FC<MainHeaderProps> = ({
         {rightComponent ? (
           rightComponent
         ) : (
-          <TouchableOpacity onPress={() => router.navigate('/cart')}>
-            <CartIconWithBadge color="white"/> 
+          <TouchableOpacity onPress={() => router.navigate('/users')}>
+            <Ionicons name="wallet" size={24} color="white" />
           </TouchableOpacity>
         )}
       </View>

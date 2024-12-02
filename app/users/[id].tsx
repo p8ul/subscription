@@ -1,24 +1,8 @@
-import useProductQueries from "@/database/hooks/products/useProductQueries";
-import { Product } from "@/models/Product";
 import { router, useLocalSearchParams } from "expo-router";
-import SegmentedControl from "@react-native-segmented-control/segmented-control";
 
 import { get } from "lodash";
 import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  Image,
-  StyleSheet,
-  TouchableOpacity,
-  ActivityIndicator,
-} from "react-native";
-import StockHistory from "@/components/sections/Stock/StockHistory";
-import MainHeader from "@/components/Header/MainHeader";
-import { Button } from "@/components/ui/button";
-import ProductFormModal from "@/components/sections/Product/ProductFormModal";
-import useCategoryQueries from "@/database/hooks/category/useCategoryQueries";
-import EmptyProduct from "@/components/sections/Product/EmptyProduct";
+import { View, StyleSheet, ActivityIndicator, ScrollView } from "react-native";
 import { User } from "@/context/AppContext";
 import useUserQueries from "@/database/hooks/users/useUserQueries";
 import UserForm from "@/components/sections/Users/UserForm";
@@ -37,7 +21,6 @@ const ProductDetailScreen = () => {
 
   const handleGetUser = async () => {
     const data = await getUser(id as number);
-    console.log("data :>> ", data);
     setUser(get(data, "[0]", {}) as User);
   };
 
@@ -47,9 +30,9 @@ const ProductDetailScreen = () => {
 
   const handleSaveUser = async (values) => {
     if (id) {
-      const user = await updateUser(values);
+      await updateUser(values);
     } else {
-      const user = await createUser(values);
+      await createUser(values);
     }
     router.push(`/users`);
     handleGetUser();
@@ -70,7 +53,6 @@ const ProductDetailScreen = () => {
       <UserForm
         initialValues={user}
         onSubmit={(values) => {
-          console.log("values :>--> ", values);
           handleSaveUser(values);
         }}
       />

@@ -4,62 +4,16 @@ import {
   View,
   Text,
   StyleSheet,
-  FlatList,
   TouchableOpacity,
   Dimensions,
   Image,
-  SectionList,
+  ScrollView,
 } from "react-native";
-import { AntDesign } from "@expo/vector-icons";
 import { useIsFocused } from "@react-navigation/native";
 import { get } from "lodash";
 import { getFullMonthName } from "@/utils";
-
-const { width } = Dimensions.get("window");
-
-const upcomingPayments = [
-  {
-    id: "1",
-    name: "Netflix",
-    date: "Tomorrow",
-    amount: "$11.50",
-    icon: require("../../../assets/icons/64x64/4.png"), // Add your Netflix logo here
-  },
-  {
-    id: "2",
-    name: "Apple One",
-    date: "Nov 24, 2023",
-    amount: "$14.90",
-    icon: require("../../../assets/icons/64x64/4.png"), // Add your Apple logo here
-  },
-];
-
-const subscriptions = [
-  {
-    id: "3",
-    name: "Disney+",
-    date: "Nov 24, 2023",
-    amount: "$6.90",
-    category: "Entertainment",
-    icon: require("../../../assets/icons/64x64/4.png"), // Add your Disney+ logo here
-  },
-  {
-    id: "4",
-    name: "Apple One",
-    date: "Nov 29, 2023",
-    amount: "$14.90",
-    category: "Music",
-    icon: require("../../../assets/icons/64x64/4.png"), // Add your Apple logo here
-  },
-  {
-    id: "5",
-    name: "Netflix",
-    date: "Tomorrow",
-    amount: "$11.50",
-    category: "TV",
-    icon: require("../../../assets/icons/64x64/4.png"), // Add your Netflix logo here
-  },
-];
+import { router } from "expo-router";
+import SubIcon from "@/components/icons/SubIcon";
 
 const HomeSection = () => {
   const { getAllSubscriptions } = useSubscriptionQueries();
@@ -68,25 +22,25 @@ const HomeSection = () => {
   const [subscriptions, setSubscriptions] = useState([]);
   const [totals, setTotals] = useState({ pending: 0, paid: 0 });
   const isFocused = useIsFocused();
+
   const loadSubscriptions = async () => {
-    const data = await getAllSubscriptions(); // Replace with your SQLite query
-    setSubscriptions(get(data, "subscriptions", []));
-    setTotal(get(data, "totalAmount", 0));
-    console.log('data[ :>> ', get(data, "subscriptions[0]", []));
+    const result = await getAllSubscriptions();
+    const data = get(result, "subscriptions", []);
+    setSubscriptions(data);
+    setTotal(get(result, "totalAmount", 0));
 
     // Calculate totals
     const totalPending = data
-      .filter((sub) => sub.status === "pending")
-      .reduce((acc, curr) => acc + curr.amount, 0);
-
+      ?.filter((sub) => sub.status === "pending")
+      ?.reduce((acc, curr) => acc + curr.amount, 0);
     const totalPaid = data
-      .filter((sub) => sub.status === "paid")
-      .reduce((acc, curr) => acc + curr.amount, 0);
-console.log('totalPaid, totalPending :>> ', totalPaid, totalPending);
+      ?.filter((sub) => sub.status === "paid")
+      ?.reduce((acc, curr) => acc + curr.amount, 0);
+
     setTotals({ pending: totalPending, paid: totalPaid });
   };
 
-  const sectionData = [
+  const sections = [
     {
       title: "Upcoming Payments",
       data: subscriptions.filter((sub) => sub.status === "pending"),
@@ -96,69 +50,83 @@ console.log('totalPaid, totalPending :>> ', totalPaid, totalPending);
       data: subscriptions.filter((sub) => sub.status === "paid"),
     },
   ];
+
   useEffect(() => {
     loadSubscriptions();
   }, [isFocused]);
+
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.scrollContainer}>
       {/* Header Section */}
       <View style={styles.header}>
         <Text style={styles.expenses}>{total}/-</Text>
-        <Text style={styles.subtext}>Expenses in {getFullMonthName()}</Text>
-        {/* <Text style={styles.subText}>
-          Pending: ${totals.pending.toFixed(2)} | Paid: $
-          {totals.paid.toFixed(2)}
-        </Text> */}
+        <Text style={styles.subtext}>
+          Subscriptions in {getFullMonthName()}
+        </Text>
+        <Text style={styles.subtext}>
+          Pending: {totals.pending.toFixed(2)} | Paid: {totals.paid.toFixed(2)}
+        </Text>
         {/* Buttons */}
         <View style={styles.headerButtons}>
-          <TouchableOpacity style={styles.button}>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => router.push("/users")}
+          >
             <Text style={styles.buttonText}>Manage subs</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.button}>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => router.push("/users")}
+          >
             <Text style={styles.buttonText}>Add new sub</Text>
           </TouchableOpacity>
         </View>
       </View>
 
-      {/* Subscriptions */}
+      {/* Subscriptions Section */}
       <View style={styles.section}>
-        {/* SectionList */}
-        <SectionList
-          sections={sectionData}
-          keyExtractor={(item) => item.id.toString()}
-          renderSectionHeader={({ section: { title } }) => (
-            <Text style={styles.sectionTitle}>{title}</Text>
-          )}
-          renderItem={({ item }) => (
-            <View style={styles.subscriptionItem}>
-              <View style={styles.listItem} key={item.id}>
-                <Image
-                  source={require("../../../assets/icons/64x64/4.png")}
-                  style={styles.icon}
-                />
-                <View style={styles.itemDetails}>
-                  <Text style={styles.itemName}>{item.name}</Text>
-                  <Text style={styles.itemDate}>{get(item, 'user.name')} | {item.dueDate}</Text>
+        {sections.map((section) => (
+          <View key={section.title}>
+            {/* Section Title */}
+            <Text style={styles.sectionTitle}>{section.title}</Text>
+
+            {/* Section Items */}
+            {section.data.length > 0 ? (
+              section.data.map((item) => (
+                <View style={styles.subscriptionItem} key={item.id}>
+                  <View style={styles.listItem}>
+                    <SubIcon width={50} height={50} color="white" />
+                   
+                    <View style={styles.itemDetails}>
+                      <Text style={styles.itemName}>{item.name}</Text>
+                      <Text style={styles.itemDate}>
+                        {get(item, "user.name")} 
+                      </Text>
+                      <Text style={styles.itemDate}>
+                         {item.dueDate}
+                      </Text>
+                    </View>
+                    <Text style={styles.itemAmount}>
+                      {item.amount.toFixed(2)}/-
+                    </Text>
+                  </View>
                 </View>
-                <Text style={styles.itemAmount}>
-                  {item.amount.toFixed(2)}/-
-                </Text>
-              </View>
-            </View>
-          )}
-          contentContainerStyle={styles.listContainer}
-        />
+              ))
+            ) : (
+              <Text style={styles.noData}>No data available</Text>
+            )}
+          </View>
+        ))}
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
+  scrollContainer: {
+    flexGrow: 1,
     backgroundColor: "#121212",
     padding: 20,
-    height: 1000,
   },
   header: {
     alignItems: "center",
@@ -226,6 +194,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#fff",
     fontWeight: "bold",
+  },
+  noData: {
+    color: "#aaa",
+    fontSize: 14,
+    textAlign: "center",
+    marginVertical: 10,
   },
 });
 

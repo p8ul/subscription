@@ -2,7 +2,6 @@ import "@/global.css";
 import { Tabs } from "expo-router";
 import React from "react";
 import { Ionicons } from "@expo/vector-icons";
-import CartIconWithBadge from "@/components/Header/CartIconWithBadge";
 
 // Create a client
 
@@ -46,9 +45,7 @@ export default function RootLayout() {
     >
       <Tabs.Screen name="home" options={{ title: "Home" }} />
       <Tabs.Screen name="users" options={{ title: "Users" }} />
-      <Tabs.Screen name="product" options={{ title: "Product" }} />
 
-      <Tabs.Screen name="orders" options={{ title: "Orders" }} />
       <Tabs.Screen name="settings" options={{ title: "Settings" }} />
     </Tabs>
   );

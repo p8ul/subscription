@@ -5,7 +5,7 @@ import {
   TextInput,
   Button,
   StyleSheet,
-  FlatList,
+  ScrollView,
   TouchableOpacity,
 } from "react-native";
 import { Formik, FieldArray } from "formik";
@@ -13,9 +13,7 @@ import * as Yup from "yup";
 import MainHeader from "@/components/Header/MainHeader";
 import { get } from "lodash";
 import SegmentedControl from "@react-native-segmented-control/segmented-control";
-import EmptySubscription from "./EmptySubscription";
 import UserSubscription from "./UserSubscription";
-import SubFormModal from "./SubFormModal";
 
 // Validation Schema
 const UserSchema = Yup.object().shape({
@@ -27,10 +25,10 @@ const UserSchema = Yup.object().shape({
 // Form Component
 const UserForm = ({ initialValues, onSubmit }) => {
   const [currentTab, setCurrentTab] = useState(0);
- 
+
   return (
     <Formik
-      initialValues={{ ...initialValues, meta: initialValues.meta || {} }}
+      initialValues={{ ...initialValues, meta: initialValues.meta || [] }}
       validationSchema={UserSchema}
       onSubmit={onSubmit}
     >
@@ -43,13 +41,13 @@ const UserForm = ({ initialValues, onSubmit }) => {
         handleSubmit,
         setFieldValue,
       }) => (
-        <View>
+        <View style={styles.container}>
           <MainHeader
             title={get(initialValues, "name", "Add User")}
             rightComponent={
               <TouchableOpacity
                 onPress={() => {
-                  console.log("errors :>> ", errors);
+                  console.log("Errors:", errors);
                   handleSubmit();
                 }}
               >
@@ -62,72 +60,75 @@ const UserForm = ({ initialValues, onSubmit }) => {
               values={["Details", "Subscriptions"]}
               style={{ marginBottom: 15 }}
               selectedIndex={currentTab}
-              //   tintColor÷="#333"
               appearance="dark"
               onChange={(event) => {
                 setCurrentTab(event.nativeEvent.selectedSegmentIndex);
               }}
             />
           </View>
-          
-          {currentTab === 1 ? (<UserSubscription userId={get(initialValues, 'id')} />): null}
-          {currentTab === 0 ? (
-            <View style={styles.formContainer}>
-              {/* Name Field */}
-              <Text style={{ color: "white" }}>Name</Text>
-              <TextInput
-                style={styles.input}
-                onChangeText={handleChange("name")}
-                onBlur={handleBlur("name")}
-                value={values.name}
-                placeholderTextColor="rgba(255, 255, 255, 0.6)"
-              />
-              {errors.name && touched.name && (
-                <Text style={styles.error}>{errors.name}</Text>
-              )}
 
-              {/* Email Field */}
-              <Text style={{ color: "white" }}>Email</Text>
-              <TextInput
-                style={styles.input}
-                onChangeText={handleChange("email")}
-                onBlur={handleBlur("email")}
-                value={values.email}
-                keyboardType="email-address"
-                placeholderTextColor="rgba(255, 255, 255, 0.6)"
-              />
-              {errors.email && touched.email && (
-                <Text style={styles.error}>{errors.email}</Text>
-              )}
+          {currentTab === 1 ? (
+            <UserSubscription userId={get(initialValues, "id")} />
+          ) : (
+            <ScrollView>
+              <View style={styles.formContainer}>
+                {/* Name Field */}
+                <Text style={styles.label}>Name</Text>
+                <TextInput
+                  style={styles.input}
+                  onChangeText={handleChange("name")}
+                  onBlur={handleBlur("name")}
+                  value={values.name}
+                  placeholder="Enter name"
+                  placeholderTextColor="rgba(255, 255, 255, 0.6)"
+                />
+                {errors.name && touched.name && (
+                  <Text style={styles.error}>{errors.name}</Text>
+                )}
 
-              {/* Phone Field */}
-              <Text style={{ color: "white" }}>Phone</Text>
-              <TextInput
-                style={styles.input}
-                onChangeText={handleChange("phone")}
-                onBlur={handleBlur("phone")}
-                value={values.phone}
-                keyboardType="phone-pad"
-                placeholderTextColor="rgba(255, 255, 255, 0.6)"
-              />
-              {errors.phone && <Text style={styles.error}>{errors.phone}</Text>}
+                {/* Email Field */}
+                <Text style={styles.label}>Email</Text>
+                <TextInput
+                  style={styles.input}
+                  onChangeText={handleChange("email")}
+                  onBlur={handleBlur("email")}
+                  value={values.email}
+                  keyboardType="email-address"
+                  placeholder="Enter email"
+                  placeholderTextColor="rgba(255, 255, 255, 0.6)"
+                />
+                {errors.email && touched.email && (
+                  <Text style={styles.error}>{errors.email}</Text>
+                )}
 
-              {/* Meta Fields */}
-              <Text style={{ color: "white" }}>Meta Fields</Text>
-              <FieldArray
-                name="meta"
-                render={(arrayHelpers) => (
-                  <View>
-                    <FlatList
-                      data={values.meta}
-                      keyExtractor={(item, index) => `${item?.name}-${index}`}
-                      renderItem={({ item, index }) => (
-                        <View style={styles.metaItem}>
+                {/* Phone Field */}
+                <Text style={styles.label}>Phone</Text>
+                <TextInput
+                  style={styles.input}
+                  onChangeText={handleChange("phone")}
+                  onBlur={handleBlur("phone")}
+                  value={values.phone}
+                  keyboardType="phone-pad"
+                  placeholder="Enter phone"
+                  placeholderTextColor="rgba(255, 255, 255, 0.6)"
+                />
+                {errors.phone && touched.phone && (
+                  <Text style={styles.error}>{errors.phone}</Text>
+                )}
+
+                {/* Meta Fields */}
+                <Text style={styles.label}>Meta Fields</Text>
+                <FieldArray
+                  name="meta"
+                  render={(arrayHelpers) => (
+                    <View>
+                      {values.meta.map((item, index) => (
+                        <View key={index} style={styles.metaItem}>
                           {/* Meta Name */}
                           <TextInput
-                            placeholderTextColor="rgba(255, 255, 255, 0.6)"
-                            placeholder="Field Name"
                             style={[styles.input, styles.metaInput]}
+                            placeholder="Field Name"
+                            placeholderTextColor="rgba(255, 255, 255, 0.6)"
                             onChangeText={(text) =>
                               setFieldValue(`meta[${index}].name`, text)
                             }
@@ -143,9 +144,9 @@ const UserForm = ({ initialValues, onSubmit }) => {
 
                           {/* Meta Value */}
                           <TextInput
+                            style={[styles.input, styles.metaInput]}
                             placeholder="Field Value"
                             placeholderTextColor="rgba(255, 255, 255, 0.6)"
-                            style={[styles.input, styles.metaInput]}
                             onChangeText={(text) =>
                               setFieldValue(`meta[${index}].value`, text)
                             }
@@ -167,19 +168,19 @@ const UserForm = ({ initialValues, onSubmit }) => {
                             <Text style={styles.deleteButtonText}>X</Text>
                           </TouchableOpacity>
                         </View>
-                      )}
-                    />
-
-                    {/* Add New Meta Field */}
-                    <Button
-                      title="Add Meta Field"
-                      onPress={() => arrayHelpers.push({ name: "", value: "" })}
-                    />
-                  </View>
-                )}
-              />
-            </View>
-          ) : null}
+                      ))}
+                      <Button
+                        title="Add Meta Field"
+                        onPress={() =>
+                          arrayHelpers.push({ name: "", value: "" })
+                        }
+                      />
+                    </View>
+                  )}
+                />
+              </View>
+            </ScrollView>
+          )}
         </View>
       )}
     </Formik>
@@ -187,39 +188,26 @@ const UserForm = ({ initialValues, onSubmit }) => {
 };
 
 export default UserForm;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 30,
-    backgroundColor: "#121212", // Dark background
+    backgroundColor: "#121212",
   },
   formContainer: {
-    marginTop: 20,
     padding: 20,
   },
-  header: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 10,
-    color: "white", // White text for dark mode
+  label: {
+    color: "white",
+    marginBottom: 5,
   },
   input: {
     borderWidth: 1,
-    borderColor: "#ccc", // Border remains light for contrast
+    borderColor: "#ccc",
     borderRadius: 5,
     padding: 10,
     marginBottom: 10,
-    width: "100%",
-    color: "white", // Text color is white
-  },
-  inputPlaceholder: {
-    color: "rgba(255, 255, 255, 0.6)", // Lighter white for placeholder
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: "bold",
-    marginBottom: 5,
-    color: "white", // White labels for dark mode
+    color: "white",
   },
   error: {
     color: "red",
@@ -241,7 +229,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   deleteButtonText: {
-    color: "#fff",
+    color: "white",
     fontWeight: "bold",
   },
 });

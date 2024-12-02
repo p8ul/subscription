@@ -14,13 +14,11 @@ import * as Yup from "yup";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { AntDesign } from "@expo/vector-icons";
 
-
 // Validation Schema
 const SubscriptionSchema = Yup.object({
   name: Yup.string().required("Subscription name is required"),
   amount: Yup.number().required("Amount is required"),
   dueDate: Yup.date().required("Due date is required"),
-
 });
 
 const SubFormModal = ({
@@ -155,25 +153,38 @@ const SubFormModal = ({
                             </TouchableOpacity>
                           </View>
                         ))}
-                        <Button
-                          title="Add Meta Field"
+                        <TouchableOpacity
                           onPress={() =>
                             arrayHelpers.push({ name: "", value: "" })
                           }
-                        />
+                          style={[styles.button, styles.confirmButton]}
+                        >
+                          <Text style={styles.deleteButtonText}>
+                            Add Meta Field
+                          </Text>
+                        </TouchableOpacity>
                       </View>
                     )}
                   />
 
                   {/* Submit Button */}
-                  <Button
-                    title="Save"
-                    onPress={() => {
-                      console.log('errors :>> ', errors);
-                      handleSubmit(values);
-                    }}
-                  />
-                  <Button title="Cancel" color="red" onPress={onClose} />
+                  <View style={styles.buttonContainer}>
+                    <TouchableOpacity
+                      style={[styles.button, styles.confirmButton]}
+                      onPress={() => {
+                        handleSubmit(values);
+                      }}
+                    >
+                      <Text style={styles.buttonText}>Save</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      style={[styles.button, styles.cancelButton]}
+                      onPress={onClose}
+                    >
+                      <Text style={styles.buttonText}>Cancel</Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
               )}
             </Formik>
@@ -185,6 +196,30 @@ const SubFormModal = ({
 };
 
 const styles = StyleSheet.create({
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+    marginTop: 10,
+  },
+  button: {
+    flex: 1,
+    padding: 12,
+    borderRadius: 5,
+    alignItems: "center",
+    marginHorizontal: 5,
+  },
+  confirmButton: {
+    backgroundColor: "#333",
+  },
+  cancelButton: {
+    backgroundColor: "grey",
+  },
+  buttonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0, 0, 0, 0.5)",
