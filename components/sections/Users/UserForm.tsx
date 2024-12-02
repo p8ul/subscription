@@ -14,6 +14,7 @@ import MainHeader from "@/components/Header/MainHeader";
 import { get } from "lodash";
 import SegmentedControl from "@react-native-segmented-control/segmented-control";
 import UserSubscription from "./UserSubscription";
+import { useLocalSearchParams } from "expo-router";
 
 // Validation Schema
 const UserSchema = Yup.object().shape({
@@ -24,7 +25,9 @@ const UserSchema = Yup.object().shape({
 
 // Form Component
 const UserForm = ({ initialValues, onSubmit }) => {
-  const [currentTab, setCurrentTab] = useState(0);
+  const params = useLocalSearchParams();
+  const { tab } = params;
+  const [currentTab, setCurrentTab] = useState(Number(tab) || 0);
 
   return (
     <Formik

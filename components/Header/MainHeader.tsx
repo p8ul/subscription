@@ -20,7 +20,7 @@ const MainHeader: React.FC<MainHeaderProps> = ({
     <View style={styles.headerContainer}>
       {/* Left Component: either Back Button or Logo */}
       {showLeftComponentAsLogo ? (
-         <SubIcon width={50} height={50} color="white" />
+         <SubIcon width={34} height={34} color="white" />
       ) : (
         <TouchableOpacity
           onPress={() => router.back()}

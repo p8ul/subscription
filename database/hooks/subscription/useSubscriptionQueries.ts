@@ -61,7 +61,7 @@ const useSubscriptionQueries = () => {
     try {
       // Log the query for debugging
       console.log("Executing SQL Query:");
-  
+
       const result = await db.getAllAsync(
         ` SELECT 
             Subscription.id AS subscriptionId,
@@ -81,20 +81,20 @@ const useSubscriptionQueries = () => {
          WHERE Subscription.isDeleted = 0`,
         []
       );
-  
+
       // Log raw result for debugging
-  
+
       // Map over the result to parse meta and structure the subscriptions
       const subscriptions = result.map((sub) => {
         let parsedMeta;
-  
+
         try {
           parsedMeta = sub.meta ? JSON.parse(sub.meta) : {}; // Safely parse meta JSON
         } catch (error) {
           console.error("Error parsing meta JSON:", error, "Meta:", sub.meta);
           parsedMeta = {}; // Fallback to an empty object
         }
-  
+
         return {
           id: sub.subscriptionId, // Use alias 'subscriptionId'
           name: sub.subscriptionName, // Use alias 'subscriptionName'
@@ -111,12 +111,12 @@ const useSubscriptionQueries = () => {
           },
         };
       });
-  
+
       // Extract the total amount from the first row
       const totalAmount = result.length > 0 ? result[0].totalAmount : 0;
-  
+
       // Log the final structured subscriptions and total amount
-  
+
       return { subscriptions, totalAmount };
     } catch (error) {
       console.error("Error fetching subscriptions:", error);
@@ -212,17 +212,20 @@ const useSubscriptionQueries = () => {
       const activeSubscriptions = await db.getAllAsync(
         `SELECT * FROM Subscription WHERE status = 'paid'`
       );
-
+      console.log("activeSubscriptions :>> ", activeSubscriptions);
       for (const sub of activeSubscriptions) {
         const nextDueDate = new Date(sub.dueDate);
-        nextDueDate.setMonth(nextDueDate.getMonth() + 1);
 
-        await addSubscription(
-          sub.userId,
-          sub.amount,
-          nextDueDate.toISOString(),
-          sub.meta
-        );
+        nextDueDate.setMonth(nextDueDate.getMonth() + 1);
+        console.log("nextDueDate :>> ", nextDueDate);
+
+        await addSubscription({
+          userId: sub.userId,
+          amount: sub.amount,
+          dueDate: nextDueDate.toISOString(),
+          meta: sub.meta,
+          name: sub.name,
+        });
       }
       console.log("Next month's subscriptions generated.");
     } catch (error) {

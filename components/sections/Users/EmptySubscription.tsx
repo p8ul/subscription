@@ -32,7 +32,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: "#403c3c",
     padding: 20,
-    height: deviceHeight / 4,
     borderRadius: 10
   },
   illustration: {

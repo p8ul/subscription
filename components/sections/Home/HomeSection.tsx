@@ -92,25 +92,33 @@ const HomeSection = () => {
 
             {/* Section Items */}
             {section.data.length > 0 ? (
-              section.data.map((item) => (
-                <View style={styles.subscriptionItem} key={item.id}>
-                  <View style={styles.listItem}>
-                    <SubIcon width={50} height={50} color="white" />
-                   
-                    <View style={styles.itemDetails}>
-                      <Text style={styles.itemName}>{item.name}</Text>
-                      <Text style={styles.itemDate}>
-                        {get(item, "user.name")} 
-                      </Text>
-                      <Text style={styles.itemDate}>
-                         {item.dueDate}
+              section.data.map((item, index) => (
+                <TouchableOpacity
+                  key={`${get(item, "userId")}-${index}`}
+                  onPress={() => {
+                    router.push({
+                      pathname: `users/${get(item, "userId")}`,
+                      params: { tab: 1 },
+                    });
+                  }}
+                >
+                  <View style={styles.subscriptionItem} key={item.id}>
+                    <View style={styles.listItem}>
+                      <SubIcon width={50} height={50} color="white" />
+
+                      <View style={styles.itemDetails}>
+                        <Text style={styles.itemName}>{item.name}</Text>
+                        <Text style={styles.itemDate}>
+                          {get(item, "user.name")}
+                        </Text>
+                        <Text style={styles.itemDate}>{item.dueDate}</Text>
+                      </View>
+                      <Text style={styles.itemAmount}>
+                        {item.amount.toFixed(2)}/-
                       </Text>
                     </View>
-                    <Text style={styles.itemAmount}>
-                      {item.amount.toFixed(2)}/-
-                    </Text>
                   </View>
-                </View>
+                </TouchableOpacity>
               ))
             ) : (
               <Text style={styles.noData}>No data available</Text>

@@ -8,7 +8,6 @@ import {
   FlatList,
   TouchableOpacity,
   Dimensions,
-  Image,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Entypo from "@expo/vector-icons/Entypo";
@@ -20,7 +19,7 @@ import {
 } from "react-native-popup-menu";
 import ConfirmModal from "@/components/Modals/ConfirmModal";
 import useUserQueries from "@/database/hooks/users/useUserQueries";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useIsFocused } from "@react-navigation/native";
 
 const { height } = Dimensions.get("window");
@@ -30,6 +29,7 @@ const UserSection = () => {
   const [open, setOpen] = useState(false);
   const [user, setUser] = useState({});
   const { softDeleteUser } = useUserQueries();
+  
   const { initializeUserTable, getUsers } = useUserQueries();
   const isFocused = useIsFocused();
   useEffect(() => {
@@ -163,6 +163,7 @@ const styles = StyleSheet.create({
   },
   section: {
     marginVertical: 20,
+    height: height + 1000,
   },
   sectionTitle: {
     fontSize: 18,

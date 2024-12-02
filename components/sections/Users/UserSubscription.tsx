@@ -17,6 +17,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { getFullMonthName } from "@/utils";
 import MenuPopper from "@/components/Modals/MenuPopper";
 import ConfirmModal from "@/components/Modals/ConfirmModal";
+import { router } from "expo-router";
 
 const { width, height } = Dimensions.get("window");
 
@@ -90,7 +91,9 @@ const UserSubscription: React.FC<{ userId: number }> = ({ userId }) => {
 
         {/* Buttons */}
         <View style={styles.headerButtons}>
-          <TouchableOpacity style={styles.button}>
+          <TouchableOpacity style={styles.button} onPress={() => {
+            router.push('users')
+          }}>
             <Text style={styles.buttonText}>Manage subs</Text>
           </TouchableOpacity>
           <TouchableOpacity
