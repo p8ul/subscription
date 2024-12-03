@@ -80,6 +80,17 @@ const UserSubscription: React.FC<{ userId: number }> = ({ userId }) => {
     handleFetchSubscription();
   }, [userId, isFocused]);
 
+  if (!userId) {
+    return (
+      <View style={styles.header}>
+        <Text style={styles.expenses}>{total}/-</Text>
+        <Text style={styles.subtext}>
+          Click save to continue
+        </Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       {/* Header Section */}
@@ -91,9 +102,12 @@ const UserSubscription: React.FC<{ userId: number }> = ({ userId }) => {
 
         {/* Buttons */}
         <View style={styles.headerButtons}>
-          <TouchableOpacity style={styles.button} onPress={() => {
-            router.push('users')
-          }}>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => {
+              router.push("users");
+            }}
+          >
             <Text style={styles.buttonText}>Manage subs</Text>
           </TouchableOpacity>
           <TouchableOpacity

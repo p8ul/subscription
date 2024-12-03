@@ -11,5 +11,5 @@ export const settingsQueries = {
     meta TEXT -- JSON data as a TEXT field
 );`,
   populateItems: `INSERT OR IGNORE INTO Setting (storeName, currency, timezone) 
-VALUES ('Liquor Store', 'KSH', 'Africa/Nairobi');`,
+VALUES ('Subscription', 'KSH', 'Africa/Nairobi');`,
 };

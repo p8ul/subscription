@@ -131,7 +131,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#121212",
     paddingHorizontal: 20,
-    height: height + 1000,
   },
   header: {
     alignItems: "center",
@@ -163,7 +162,8 @@ const styles = StyleSheet.create({
   },
   section: {
     marginVertical: 20,
-    height: height + 1000,
+   flex: 1, 
+   marginBottom: 100,
   },
   sectionTitle: {
     fontSize: 18,

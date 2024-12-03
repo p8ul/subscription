@@ -5,8 +5,6 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  Dimensions,
-  Image,
   ScrollView,
 } from "react-native";
 import { useIsFocused } from "@react-navigation/native";
@@ -14,17 +12,24 @@ import { get } from "lodash";
 import { getFullMonthName } from "@/utils";
 import { router } from "expo-router";
 import SubIcon from "@/components/icons/SubIcon";
-
+import MonthSelectionModal from "./MonthSelectionModal";
 const HomeSection = () => {
   const { getAllSubscriptions } = useSubscriptionQueries();
 
   const [total, setTotal] = useState(0);
   const [subscriptions, setSubscriptions] = useState([]);
   const [totals, setTotals] = useState({ pending: 0, paid: 0 });
+  const [manageOpen, setManageOpen] = useState(false);
+
+  // Default to current month's start and end dates
+  const [startMonth, setStartMonth] = useState(new Date(new Date().getFullYear(), new Date().getMonth(), 1));
+  const [endMonth, setEndMonth] = useState(new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0));
+
   const isFocused = useIsFocused();
 
-  const loadSubscriptions = async () => {
-    const result = await getAllSubscriptions();
+  const loadSubscriptions = async (status='') => {
+    // Fetch subscriptions within the selected date range
+    const result = await getAllSubscriptions(startMonth, endMonth, status);
     const data = get(result, "subscriptions", []);
     setSubscriptions(data);
     setTotal(get(result, "totalAmount", 0));
@@ -40,6 +45,13 @@ const HomeSection = () => {
     setTotals({ pending: totalPending, paid: totalPaid });
   };
 
+  const onGenerate = ({ startMonth, endMonth, status='' }) => {
+    setStartMonth(startMonth);
+    setEndMonth(endMonth);
+    setManageOpen(false); // Close the modal
+    loadSubscriptions(status); // Reload subscriptions
+  };
+
   const sections = [
     {
       title: "Upcoming Payments",
@@ -53,15 +65,20 @@ const HomeSection = () => {
 
   useEffect(() => {
     loadSubscriptions();
-  }, [isFocused]);
+  }, [isFocused, startMonth, endMonth]);
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       {/* Header Section */}
+      <MonthSelectionModal
+        visible={manageOpen}
+        onClose={() => setManageOpen(false)}
+        onGenerate={onGenerate}
+      />
       <View style={styles.header}>
         <Text style={styles.expenses}>{total}/-</Text>
         <Text style={styles.subtext}>
-          Subscriptions in {getFullMonthName()}
+          Subscriptions from {startMonth?.toLocaleDateString()} to {endMonth?.toLocaleDateString()}
         </Text>
         <Text style={styles.subtext}>
           Pending: {totals.pending.toFixed(2)} | Paid: {totals.paid.toFixed(2)}
@@ -70,9 +87,9 @@ const HomeSection = () => {
         <View style={styles.headerButtons}>
           <TouchableOpacity
             style={styles.button}
-            onPress={() => router.push("/users")}
+            onPress={() => setManageOpen(true)}
           >
-            <Text style={styles.buttonText}>Manage subs</Text>
+            <Text style={styles.buttonText}>Filter</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.button}
@@ -166,6 +183,7 @@ const styles = StyleSheet.create({
   },
   section: {
     marginVertical: 20,
+    marginBottom: 200,
   },
   sectionTitle: {
     fontSize: 18,
