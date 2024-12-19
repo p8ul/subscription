@@ -23,11 +23,12 @@ const HomeSection = () => {
 
   // Default to current month's start and end dates
   const [startMonth, setStartMonth] = useState(new Date(new Date().getFullYear(), new Date().getMonth(), 1));
-  const [endMonth, setEndMonth] = useState(new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0));
+  const [endMonth, setEndMonth] = useState(null);
 
   const isFocused = useIsFocused();
 
   const loadSubscriptions = async (status='') => {
+    console.log('startMonth, endMonth :>> ', startMonth, endMonth);
     // Fetch subscriptions within the selected date range
     const result = await getAllSubscriptions(startMonth, endMonth, status);
     const data = get(result, "subscriptions", []);
@@ -43,6 +44,7 @@ const HomeSection = () => {
       ?.reduce((acc, curr) => acc + curr.amount, 0);
 
     setTotals({ pending: totalPending, paid: totalPaid });
+    setTotal(Number(totalPending + totalPaid));
   };
 
   const onGenerate = ({ startMonth, endMonth, status='' }) => {

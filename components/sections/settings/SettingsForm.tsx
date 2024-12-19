@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Button,
   ScrollView,
+  Switch,
 } from "react-native";
 import { Formik } from "formik";
 import * as Yup from "yup";
@@ -22,6 +23,7 @@ const SettingsForm = ({
     accountNumber?: string;
     tillNumber?: string;
     phoneNumber?: string;
+    autoGenerateNextMonth: number;
   };
   onSubmit: (values: any) => void;
 }) => {
@@ -46,6 +48,7 @@ const SettingsForm = ({
           values,
           errors,
           touched,
+          setFieldValue,
         }) => (
           <View>
             {/* Store Name */}
@@ -105,6 +108,19 @@ const SettingsForm = ({
               <Text style={styles.errorText}>{errors.timezone}</Text>
             )}
 
+            {/* Auto-generate Next Month */}
+            <View style={styles.toggleContainer}>
+              <Text style={styles.label}>Auto-generate Next Month</Text>
+              <Switch
+                value={values.autoGenerateNextMonth}
+                onValueChange={(value) =>
+                  setFieldValue("autoGenerateNextMonth", value)
+                }
+                thumbColor={values.autoGenerateNextMonth ? "#0f0" : "#888"}
+                trackColor={{ false: "#444", true: "#555" }}
+              />
+            </View>
+
             {/* Submit Button */}
             <View style={styles.buttonContainer}>
               <Button title="Save" onPress={handleSubmit as any} />
@@ -145,6 +161,12 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     marginTop: 20,
+  },
+  toggleContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 20,
   },
 });
 

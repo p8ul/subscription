@@ -6,13 +6,15 @@ const ConfirmModal = ({
   onClose,
   onConfirm,
   title='Delete Stock',
-  subTitle='Are you sure you want to delete this stock entry?'
+  subTitle='Are you sure you want to delete this stock entry?',
+  body=null
 }: {
   visible: boolean;
   onClose: () => void;
   onConfirm: () => void;
   title?: string;
   subTitle?: string;
+  body?: React.ReactElement | null
 }) => {
   return (
     <Modal
@@ -27,6 +29,7 @@ const ConfirmModal = ({
           <Text style={styles.modalMessage}>
             {subTitle}
           </Text>
+          {body}
 
           <View style={styles.buttonContainer}>
             <TouchableOpacity

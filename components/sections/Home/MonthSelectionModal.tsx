@@ -6,6 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Button,
+  Platform,
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Picker } from "@react-native-picker/picker";
@@ -78,10 +79,26 @@ const MonthSelectionModal = ({ visible, onClose, onGenerate }) => {
             onValueChange={(itemValue) => setStatus(itemValue)}
             style={styles.picker}
           >
-            <Picker.Item color="white" label="Select Status" value="" />
-            <Picker.Item color="white" label="All" value="" />
-            <Picker.Item color="white" label="Pending" value="pending" />
-            <Picker.Item color="white" label="Paid" value="paid" />
+            <Picker.Item
+              label="Select Status"
+              value=""
+              color={Platform.OS === "ios" ? "white" : undefined}
+            />
+            <Picker.Item
+              label="All"
+              value="all"
+              color={Platform.OS === "ios" ? "white" : undefined}
+            />
+            <Picker.Item
+              label="Pending"
+              value="pending"
+              color={Platform.OS === "ios" ? "white" : undefined}
+            />
+            <Picker.Item
+              label="Paid"
+              value="paid"
+              color={Platform.OS === "ios" ? "white" : undefined}
+            />
           </Picker>
 
           {/* Buttons */}

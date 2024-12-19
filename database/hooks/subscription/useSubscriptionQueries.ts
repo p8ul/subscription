@@ -57,7 +57,11 @@ const useSubscriptionQueries = () => {
 
   // Fetch all subscriptions
 
-  const getAllSubscriptions = async (startDate = null, endDate = null, status = null) => {
+  const getAllSubscriptions = async (
+    startDate = null,
+    endDate = null,
+    status = null
+  ) => {
     try {
       // Construct the SQL query dynamically based on provided filters
       let query = `
@@ -78,36 +82,36 @@ const useSubscriptionQueries = () => {
         INNER JOIN User ON Subscription.userId = User.id
         WHERE Subscription.isDeleted = 0
       `;
-  
+
       const params = [];
-  
+
       // Add date filtering to the query if startDate or endDate is provided
       if (startDate && endDate) {
         query += ` AND Subscription.dueDate BETWEEN ? AND ?`;
         params.push(startDate, endDate);
       }
-  
+
       // Add status filtering to the query if a status is provided
       if (status) {
         query += ` AND Subscription.status = ?`;
         params.push(status);
       }
-  
+
       console.log("Executing SQL Query:", query, "With Params:", params);
-  
+
       const result = await db.getAllAsync(query, params);
-  
+
       // Map over the result to parse meta and structure the subscriptions
       const subscriptions = result.map((sub) => {
         let parsedMeta;
-  
+
         try {
           parsedMeta = sub.meta ? JSON.parse(sub.meta) : {}; // Safely parse meta JSON
         } catch (error) {
           console.error("Error parsing meta JSON:", error, "Meta:", sub.meta);
           parsedMeta = {}; // Fallback to an empty object
         }
-  
+
         return {
           id: sub.subscriptionId, // Use alias 'subscriptionId'
           name: sub.subscriptionName, // Use alias 'subscriptionName'
@@ -124,10 +128,10 @@ const useSubscriptionQueries = () => {
           },
         };
       });
-  
+
       // Extract the total amount from the first row
       const totalAmount = result.length > 0 ? result[0].totalAmount : 0;
-  
+
       return { subscriptions, totalAmount };
     } catch (error) {
       console.error("Error fetching subscriptions:", error);
@@ -173,12 +177,15 @@ const useSubscriptionQueries = () => {
     }
   };
 
-  // Mark a subscription as paid
-  const markSubscriptionAsPaid = async (id, paymentDate = new Date()) => {
+  const updateSubscriptionStatus = async (
+    status = "paid",
+    id,
+    paymentDate = new Date()
+  ) => {
     try {
       await db.runAsync(
-        `UPDATE Subscription SET status = 'paid', paymentDate = ? WHERE id = ?`,
-        [paymentDate.toISOString(), id]
+        `UPDATE Subscription SET status = ?, paymentDate = ? WHERE id = ?`,
+        [status, paymentDate.toISOString(), id]
       );
       console.log(`Subscription ${id} marked as paid.`);
     } catch (error) {
@@ -292,7 +299,6 @@ const useSubscriptionQueries = () => {
     initializeSubscriptionTable,
     addSubscription,
     getAllSubscriptions,
-    markSubscriptionAsPaid,
     updateOverdueSubscriptions,
     generateNextMonthSubscriptions,
     restoreSubscription,
@@ -300,6 +306,7 @@ const useSubscriptionQueries = () => {
     permanentlyDeleteSubscription,
     getUserSubscriptions,
     editSubscription,
+    updateSubscriptionStatus,
   };
 };
 

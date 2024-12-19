@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   Dimensions,
   Image,
+  Linking,
 } from "react-native";
 import { useIsFocused } from "@react-navigation/native";
 import EmptySubscription from "./EmptySubscription";
@@ -18,8 +19,10 @@ import { getFullMonthName } from "@/utils";
 import MenuPopper from "@/components/Modals/MenuPopper";
 import ConfirmModal from "@/components/Modals/ConfirmModal";
 import { router } from "expo-router";
+import useSendSMS from "@/hooks/useSendSMS";
+import ContentModal from "@/components/Modals/ContentModal";
 
-const { width, height } = Dimensions.get("window");
+const { height } = Dimensions.get("window");
 
 const UserSubscription: React.FC<{ userId: number }> = ({ userId }) => {
   const {
@@ -27,15 +30,20 @@ const UserSubscription: React.FC<{ userId: number }> = ({ userId }) => {
     addSubscription,
     editSubscription,
     softDeleteSubscription,
-    markSubscriptionAsPaid,
+    updateSubscriptionStatus,
   } = useSubscriptionQueries();
+  const { sendMessage, SMSForm } = useSendSMS();
   const [sub, setSub] = useState();
   const [selectedSub, setSelectedSub] = useState({});
   const [total, setTotal] = useState(0);
   const isFocused = useIsFocused();
   const [subFormOpen, setSubFormOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [sendSMSOpen, setSendSMSOpen] = useState(false); //
   const [paidModalOpen, setPaidModalOpen] = useState(false);
+  const [pendingModalOpen, setPendingModalOpen] = useState(false);
+
+  
 
   const handleFetchSubscription = async () => {
     const subs = await getUserSubscriptions({ userId });
@@ -50,8 +58,20 @@ const UserSubscription: React.FC<{ userId: number }> = ({ userId }) => {
     }, 500);
   };
 
-  const markAsPaid = async () => {
-    await markSubscriptionAsPaid(get(selectedSub, "id"));
+  const handleSendSMS = async (item) => {
+    setSelectedSub(item);
+    setTimeout(() => {
+      setSendSMSOpen(true);
+    }, 500);
+  };
+  const handleMarkAsPending = async (item) => {
+    setSelectedSub(item);
+    setTimeout(() => {
+      setPendingModalOpen(true);
+    }, 500);
+  };
+  const updateStatus = async (status: string) => {
+    await updateSubscriptionStatus(status, get(selectedSub, "id"));
     await handleFetchSubscription();
   };
 
@@ -84,9 +104,7 @@ const UserSubscription: React.FC<{ userId: number }> = ({ userId }) => {
     return (
       <View style={styles.header}>
         <Text style={styles.expenses}>{total}/-</Text>
-        <Text style={styles.subtext}>
-          Click save to continue
-        </Text>
+        <Text style={styles.subtext}>Click save to continue</Text>
       </View>
     );
   }
@@ -132,14 +150,35 @@ const UserSubscription: React.FC<{ userId: number }> = ({ userId }) => {
         title="Delete Subscription"
         subTitle={`Are you sure you want to delete ${get(selectedSub, "name")}`}
       />
+       <ContentModal
+        visible={sendSMSOpen}
+        onConfirm={() => {
+          handleSendSMS(selectedSub);
+        }}
+        onClose={() => setSendSMSOpen(false)}
+        title="SMS"
+        subTitle={``}
+        
+      >
+        <SMSForm />
+      </ContentModal>
       <ConfirmModal
         visible={paidModalOpen}
         onConfirm={() => {
-          markAsPaid();
+          updateStatus("paid");
         }}
         onClose={() => setPaidModalOpen(false)}
         title="Subscription Paid"
         subTitle={`Are you sure you want to mark ${get(selectedSub, "name")} as Paid`}
+      />
+      <ConfirmModal
+        visible={pendingModalOpen}
+        onConfirm={() => {
+          updateStatus("pending");
+        }}
+        onClose={() => setPendingModalOpen(false)}
+        title="Subscription Pending"
+        subTitle={`Are you sure you want to mark ${get(selectedSub, "name")} as Pending`}
       />
       <SubFormModal
         visible={subFormOpen}
@@ -208,6 +247,18 @@ const UserSubscription: React.FC<{ userId: number }> = ({ userId }) => {
                         label: "Paid",
                         onSelect: () => {
                           handleMarkAsPaid(item);
+                        },
+                      },
+                      {
+                        label: "Pending",
+                        onSelect: () => {
+                          handleMarkAsPending(item);
+                        },
+                      },
+                      {
+                        label: "SMS",
+                        onSelect: () => {
+                          handleSendSMS(item);
                         },
                       },
                       {

@@ -19,7 +19,7 @@ const useSettingsQueries = () => {
   // Get settings
   const getSettings = async () => {
     try {
-      const settings = await db.getAllAsync(`SELECT * FROM Setting LIMIT 1`);
+      const settings = await db.getAllAsync(`SELECT * FROM Settingss LIMIT 1`);
       return settings[0] || {};
     } catch (error) {
       console.error("Error fetching settings:", error);
@@ -36,10 +36,19 @@ const useSettingsQueries = () => {
     accountNumber,
     tillNumber,
     phoneNumber,
+    autoGenerateNextMonth,
   }) => {
+    console.log(
+      "await generateNextMonthSubscriptions(); :>> ",
+      autoGenerateNextMonth
+    );
+    let autoGen = 0;
+    if (autoGenerateNextMonth) {
+      autoGen = 1;
+    }
     try {
       await db.runAsync(
-        `UPDATE Setting SET storeName = ?, currency = ?, timezone = ?, paybillNumber = ?, accountNumber = ?, tillNumber = ?, phoneNumber = ? WHERE id = 1`,
+        `UPDATE Settingss SET storeName = ?, currency = ?, timezone = ?, paybillNumber = ?, accountNumber = ?, tillNumber = ?, phoneNumber = ?, autoGenerateNextMonth = ? WHERE id = 1`,
         [
           storeName,
           currency,
@@ -47,7 +56,8 @@ const useSettingsQueries = () => {
           paybillNumber || "",
           accountNumber || "",
           tillNumber || "",
-          phoneNumber
+          phoneNumber,
+          autoGen,
         ]
       );
       console.log("Settings updated successfully.");
@@ -70,7 +80,7 @@ const useSettingsQueries = () => {
   // Delete all settings (if needed, generally not recommended)
   const deleteSettings = async () => {
     try {
-      await db.runAsync(`DELETE FROM Setting`);
+      await db.runAsync(`DELETE FROM Settingss`);
       console.log("Settings deleted successfully.");
     } catch (error) {
       console.error("Error deleting settings:", error);

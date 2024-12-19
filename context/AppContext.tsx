@@ -99,22 +99,26 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({
 
   const { getSettings } = useSettingsQueries();
   const { initializeUserTable, dummyUsers, getUsers } = useUserQueries();
-  const { initializeSubscriptionTable, generateNextMonthSubscriptions } = useSubscriptionQueries();
+  const { initializeSubscriptionTable, generateNextMonthSubscriptions } =
+    useSubscriptionQueries();
 
   useEffect(() => {
     createTables();
   }, []);
 
   async function createTables() {
-    // await db.runAsync(`DROP TABLE IF EXISTS Subscription;`)
+    // await db.runAsync(`DROP TABLE IF EXISTS Settingss;`);
     await initializeUserTable();
     await initializeSubscriptionTable();
     await dummyUsers();
-    await generateNextMonthSubscriptions();
+    
     await db.runAsync(settingsQueries.createTable);
     await db.runAsync(settingsQueries.populateItems);
 
     const settings = await getSettings();
+    if (settings?.autoGenerateNextMonth) {
+      await generateNextMonthSubscriptions();
+    }
     const users = await getUsers();
 
     dispatch(setUsers(users));
